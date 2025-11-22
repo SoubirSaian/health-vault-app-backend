@@ -23,7 +23,7 @@ function createModule(profileName: string, moduleName: string): void {
     ];
 
     const defaultContents: Record<string, string> = {
-        [`${moduleName}.interface.ts`]: `import { Types } from "mongoose";
+                [`${moduleName}.interface.ts`]: `import { Types } from "mongoose";
 
         export interface I${capitalize(moduleName)} {
             user: Types.ObjectId;
@@ -37,7 +37,7 @@ function createModule(profileName: string, moduleName: string): void {
             totalPoint?: number;
         }`,
 
-        [`${moduleName}.routes.ts`]: `import express from "express";
+                [`${moduleName}.routes.ts`]: `import express from "express";
         import auth from "../../middlewares/auth";
         import validateRequest from "../../middlewares/validateRequest";
         import ${moduleName}Validations from "./${moduleName}.validation";
@@ -50,7 +50,7 @@ function createModule(profileName: string, moduleName: string): void {
 
         export const ${moduleName}Routes = router;`,
 
-        [`${moduleName}.model.ts`]: `import { model, Schema } from "mongoose";
+                [`${moduleName}.model.ts`]: `import { model, Schema } from "mongoose";
         import { I${capitalize(moduleName)} } from "./${moduleName}.interface";
 
         const ${moduleName}Schema = new Schema<I${capitalize(moduleName)}>({
@@ -69,7 +69,7 @@ function createModule(profileName: string, moduleName: string): void {
                 )}", ${moduleName}Schema);
         export default ${moduleName}Model;`,
 
-        [`${moduleName}.controller.ts`]: `
+                [`${moduleName}.controller.ts`]: `
         import catchAsync from "../../../utilities/catchasync";
         import sendResponse from "../../../utilities/sendResponse";
         import ${moduleName}Services from "./${moduleName}.service";
@@ -94,8 +94,8 @@ function createModule(profileName: string, moduleName: string): void {
         const ${capitalize(moduleName)}Controller = { updateUserProfile };
         export default ${capitalize(moduleName)}Controller;`,
 
-        [`${moduleName}.service.ts`]: `
-        import ApiError from "../../error/ApiError";
+                [`${moduleName}.service.ts`]: `
+        import ApiError from "../../../error/ApiError";
         import { I${capitalize(moduleName)} } from "./${moduleName}.interface";
         import ${moduleName}Model from "./${moduleName}.model";
 

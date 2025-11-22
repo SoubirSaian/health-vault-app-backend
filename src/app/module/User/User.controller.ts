@@ -1,23 +1,138 @@
 import catchAsync from "../../../utilities/catchasync";
 import sendResponse from "../../../utilities/sendResponse";
-import UserServices from "./User.service";
+import userServices from "./User.service";
 
-const updateUserProfile = catchAsync(async (req, res) => {
-    const { files } = req;
-    if (files && typeof files === "object" && "profile_image" in files) {
-        req.body.profile_image = files["profile_image"][0].path;
-    }
-    const result = await UserServices.updateUserProfile(
-        req.user.profileId,
-        req.body
-    );
+const registerUser = catchAsync(async (req, res) => {
+
+    const result = await userServices.registerUserService();
+
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: "Profile updated successfully",
+        message: 'User registration successful.Check email for verify your email',
         data: result,
     });
 });
 
-const UserController = { updateUserProfile };
-export default UserController;
+const loginUser = catchAsync(async (req, res) => {
+
+    const result = await userServices.loginUserService();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User registration successful.Check email for verify your email',
+        data: result,
+    });
+});
+
+const completeUserProfile = catchAsync(async (req, res) => {
+
+    const result = await userServices.completeUserProfileService();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User registration successful.Check email for verify your email',
+        data: result,
+    });
+});
+
+// const verifyCode = catchAsync(async (req, res) => {
+//     const result = await userServices.verifyCode(
+//         req?.body?.email,
+//         req?.body?.verifyCode
+//     );
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: 'Successfully verified your account with email',
+//         data: result,
+//     });
+// });
+// const resendVerifyCode = catchAsync(async (req, res) => {
+//     const result = await userServices.resendVerifyCode(req?.body?.email);
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: 'Verify code send to your email inbox',
+//         data: result,
+//     });
+// });
+
+// const getMyProfile = catchAsync(async (req, res) => {
+//     const result = await userServices.getMyProfile(req.user);
+
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: 'Successfully retrieved your data',
+//         data: result,
+//     });
+// });
+
+// const updateUserProfile = catchAsync(async (req, res) => {
+//     const file: any = req.files?.profile_image;
+//     if (req.files?.profile_image) {
+//         req.body.profile_image = getCloudFrontUrl(file[0].key);
+//     }
+//     const address_document_file: any = req.files?.address_document;
+//     if (req.files?.address_document) {
+//         req.body.address_document = getCloudFrontUrl(
+//             address_document_file[0].key
+//         );
+//     }
+//     const result = await userServices.updateUserProfile(req.user, req.body);
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: 'Profile updated successfully',
+//         data: result,
+//     });
+// });
+// const changeUserStatus = catchAsync(async (req, res) => {
+//     const result = await userServices.changeUserStatus(req.params.id);
+
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: `User is ${result?.isBlocked ? 'Blocked' : 'Unblocked'}`,
+//         data: result,
+//     });
+// });
+// const deleteUserAccount = catchAsync(async (req, res) => {
+//     const result = await userServices.deleteUserAccount(
+//         req.user,
+//         req.body.password
+//     );
+
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: `Your account deleted successfully`,
+//         data: result,
+//     });
+// });
+// const adminVerifyUser = catchAsync(async (req, res) => {
+//     const result = await userServices.adminVerifyUserFromDB(req.params.id);
+
+//     sendResponse(res, {
+//         statusCode: httpStatus.OK,
+//         success: true,
+//         message: `User is ${result?.isAdminVerified ? 'Verify' : 'not-verify'}`,
+//         data: result,
+//     });
+// });
+
+const userController = {
+    registerUser,
+    // verifyCode,
+    // resendVerifyCode,
+    // getMyProfile,
+    // changeUserStatus,
+    // deleteUserAccount,
+    // updateUserProfile,
+    // adminVerifyUser,
+};
+
+export default userController;
