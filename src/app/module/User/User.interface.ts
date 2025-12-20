@@ -1,37 +1,32 @@
-import { Types,Model } from "mongoose";
+import { Types } from "mongoose";
 
 export interface IUser {
-    profile: Types.ObjectId;
-    name: string
-    email: string
-    password: string
-    contact: string
-    role : string
-    verificationCode: Number
-    isBlockd: boolean
-    isEmailVerified: boolean
-    // createdAt: timestamp
-}
-
-
-export interface ILoginWithGoogle {
     name: string;
     email: string;
-    profile_image?: string;
-    phone?: string;
+    password: string;
+    phone: string;
+    image: string;
+    isEmailVerified: boolean;
+    verificationCode: string;
+    campaign: number;
+    isMoveAndDeliver: Boolean;
+    isBuyAndDeliver: Boolean;
+    isRecycle: Boolean;
+    isRemove: Boolean;
+    isBlockd: boolean;
+
 }
 
-export interface UserModel extends Model<IUser> {
-    // myStaticMethod(): number;
-    isUserExists(phoneNumber: string): Promise<IUser>;
-    //   isUserDeleted(email: string): Promise<boolean>;
-    //   isUserBlocked(email: string): Promise<boolean>;
-    isPasswordMatched(
-        plainPassword: string,
-        hashPassword: string
-    ): Promise<IUser>;
-    isJWTIssuedBeforePasswordChange(
-        passwordChangeTimeStamp: Date,
-        jwtIssuedTimeStamp: number
-    ): Promise<boolean>;
+
+
+
+
+export interface IChangePassword {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
 }
+
+// export interface IUserRole {
+
+// }

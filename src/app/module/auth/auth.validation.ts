@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const registerUserValidationSchema = z.object({
+const registerUserValidationSchema = z.object({
   body: z.object({
 
     name: z
@@ -16,22 +16,18 @@ export const registerUserValidationSchema = z.object({
       .string()
       .min(6, "Password must be at least 6 characters"),
 
-    contact: z
+    confirmPassword: z
       .string()
-      .min(1, "Contact number is required"),
-
-    role: z.enum(["customer", "provider"], {
-      message: "Role is required",
-    }),
+      .min(6, "Password must be at least 6 characters"),
   })
   // validate that password === confirmPassword
-//   .refine(
-//     (data) => data.password === data.confirmPassword,
-//     {
-//       message: "Password and confirm password must match",
-//       path: ["confirmPassword"],
-//     }
-//   ),
+  .refine(
+    (data) => data.password === data.confirmPassword,
+    {
+      message: "Password and confirm password must match",
+      path: ["confirmPassword"],
+    }
+  ),
 });
 
 
@@ -41,6 +37,36 @@ const loginValidationSchema = z.object({
         email: z.string().email('Email must be a valid email'),
         password: z.string().min(6, 'Password must be at least 6 characters'),
     }),
+});
+
+const verifyCodeValidation = z.object({
+    body: z.object({
+        email: z.string().email('Email must be a valid email'),
+        verifyCode: z.string().min(4, 'Verification code must be at least 4 characters'),
+    }),
+});
+
+const sendVerifyCodeValidation = z.object({
+    body: z.object({
+        email: z.string().trim().toLowerCase().email('Email must be a valid email')
+    }),
+});
+
+const resetPasswordValidation = z.object({
+    body: z.object({
+        // email: z.string().trim().toLowerCase().email('Email must be a valid email'),
+        newPassword: z.string().min(4, 'New password must be at least 4 characters'),
+        confirmPassword: z.string().min(4, 'Confirm password must be at least 4 characters'),
+        
+      })
+      // validate that password === confirmPassword
+      .refine(
+        (data) => data.newPassword === data.confirmPassword,
+        {
+          message: "Password and confirm password must match",
+          path: ["confirmPassword"],
+        }
+      ),
 });
 
 const changePasswordValidationSchema = z.object({
@@ -61,6 +87,9 @@ const completeProfileValidationSchema = z.object({
 const AuthValidations = { 
     registerUserValidationSchema,
     loginValidationSchema,
+    verifyCodeValidation,
+    sendVerifyCodeValidation,
+    resetPasswordValidation,
     changePasswordValidationSchema,
     completeProfileValidationSchema
  };

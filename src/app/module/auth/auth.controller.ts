@@ -26,14 +26,38 @@ const loginUser = catchAsync(async (req, res) => {
     });
 });
 
-const completeUserProfile = catchAsync(async (req, res) => {
+const verifyCode = catchAsync(async (req, res) => {
     
-    const result = await authServices.completeUserService(req.user,req.body);
+    const result = await authServices.verifyCode(req.body);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: "Added user information successfully.",
+        message: "Email verified successfully.",
+        data: result,
+    });
+});
+
+const sendVerifyCode = catchAsync(async (req, res) => {
+    
+    const result = await authServices.sendVerifyCodeService(req.body);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Verification code sent successfully.",
+        data: result,
+    });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+    
+    const result = await authServices.resetPasswordService(req.body);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Password reset successfully.",
         data: result,
     });
 });
@@ -41,7 +65,9 @@ const completeUserProfile = catchAsync(async (req, res) => {
 const AuthController = { 
     registerUser ,
     loginUser,
-    completeUserProfile
+    verifyCode,
+    sendVerifyCode,
+    resetPassword
 
 };
 export default AuthController;

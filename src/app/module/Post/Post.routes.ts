@@ -1,12 +1,12 @@
 import express from "express";
         import auth from "../../middlewares/auth";
         import validateRequest from "../../middlewares/validateRequest";
-        import providerValidations from "./provider.validation";
-        import providerController from "./provider.controller";
+        import PostValidations from "./Post.validation";
+        import PostController from "./Post.controller";
         
 
         const router = express.Router();
 
         
 
-        export const providerRoutes = router;
+        export const PostRoutes = router;

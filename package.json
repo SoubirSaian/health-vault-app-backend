@@ -1,7 +1,7 @@
 {
-  "name": "health-vault-app",
+  "name": "jibjab-app",
   "version": "1.0.0",
-  "description": "it's a backend server based on node and express. In general it's a health service providing app to store and manage health records of users. users can find doctors, clicnics and hospitals nearby and book appointments. they can also store their health records like prescriptions, lab reports, medical images etc securely in cloud database.",
+  "description": "it's a backend server based on node and express. It's a kind of parcel delivery app. Where as a user can play both role, client and service provider.",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --watch src --exec ts-node src/server.ts",
@@ -41,6 +41,7 @@
     "mongoose": "^8.19.4",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
+    "stripe": "^20.1.0",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^4.1.12"

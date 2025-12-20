@@ -1,294 +1,148 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-// import httpStatus from 'http-status';
-import { JwtPayload } from 'jsonwebtoken';
-import mongoose from 'mongoose';
-// import cron from 'node-cron';
-import config from '../../../config';
-import ApiError from '../../../error/ApiError';
-import { log } from 'console';
-// import registrationSuccessEmailBody from '../../mailTemplate/registerSucessEmail';
-// import sendEmail from '../../utilities/sendEmail';
-
-// import { deleteFileFromS3 } from '../../helper/deleteFromS3';
-// import { sendSMS } from '../../helper/sendSms';
-// import { ICustomer } from '../customer/customer.interface';
-// import { Customer } from '../customer/customer.model';
-// import { Provider } from '../provider/provider.model';
-// import SuperAdmin from '../superAdmin/superAdmin.model';
-// import { USER_ROLE } from './user.constant';
-// import { TUser, TUserRole } from './user.interface';
-// import  UserModel  from './user.model';
-// import { createToken } from './user.utils';
+import ApiError from "../../../error/ApiError";
+import { Express } from "express";
+import {  IChangePassword, IUser } from "./User.interface";
+import UserModel from "./User.model";
+import { JwtPayload } from "jsonwebtoken";
+import deleteOldFile from "../../../utilities/deleteFile";
+import { IJwtPayload } from "../../../interface/jwt.interface";
 
 
-const registerUserService = async () => {
 
-    
+const updateUserProfile = async (userDetails: IJwtPayload,file: Express.Multer.File | undefined,payload: Partial<IUser>) => {
+  const { userId } = userDetails;
+
+  // Fetch user and profile in parallel
+  const user = await UserModel.findById(userId);
+   
+
+  if (!user ) {
+    throw new ApiError(404, "Profile not found to update.");
+  }
+
+  // Update fields
+  const { name, phone } = payload;
+
+  if (name) {
+    user.name = name;
+  }
+
+  if (phone) {
+    user.phone = phone;
+  }
+
+  // Handle image update
+  if (file) {
+
+    if (user.image) deleteOldFile(user.image as string);
+
+    user.image = `uploads/profile-image/${file.filename}`;
+  }
+
+  // Save both
+  await user.save();
+
+  // Return a unified response
+  return {
+      name: user.name,
+      email: user.email,
+  };
 };
 
-const loginUserService = async () => {
-    
+
+// const addLocationService = async (userDetails: JwtPayload,payload: IAddLocation) => {
+//     // Service logic goes here
+//     const {profileId,role} = userDetails;
+//    const {location} = payload;
+
+//     let profile : ICustomer| ISupplier | null = null;
+
+//     switch (role) {
+
+//         case ENUM_USER_ROLE.CUSTOMER:
+//              profile = await CustomerModel.findByIdAndUpdate(profileId, {location: location}, {new: true});
+//             break;
+
+//         case ENUM_USER_ROLE.SUPPLIER:
+//             profile = await SupplierModel.findByIdAndUpdate(profileId, {location: location}, {new: true});
+//             break;
+             
+//         default:{
+//             // const _exhaustiveCheck: never = role;
+//             throw new ApiError(400, "Invalid user role");
+//         }
+
+//     }
+
+//     if(!profile){
+//         throw new ApiError(500,'Failed to add location in the profile');
+//     }  
+
+//     return { name:profile.name,email:profile.email, location: profile.location };
+// }
+
+
+// const addBankDetailService = async (userDetails: JwtPayload,payload: IBankDetail) => {
+//     // Service logic goes here
+//     const {profileId,role} = userDetails;
+//   // console.log(payload);
+
+//     let profile : ICustomer| ISupplier | null = null;
+
+//     switch (role) {
+//         case ENUM_USER_ROLE.CUSTOMER:
+//              profile = await CustomerModel.findByIdAndUpdate(profileId,{
+//               $set: payload
+//              } , {new: true});
+//             break;
+
+//         case ENUM_USER_ROLE.SUPPLIER:
+//             profile = await SupplierModel.findByIdAndUpdate(profileId, {
+//               $set: payload
+//             }, {new: true});
+//             break;
+             
+//         default:{
+//             // const _exhaustiveCheck: never = role;
+//             throw new ApiError(400, "Invalid user role");
+//         }
+
+//     }
+//     // console.log(profile);
+//     if(!profile){
+//         throw new ApiError(500,'Failed to add location in the profile');
+//     }  
+
+//     return { name:profile.name,email:profile.email, location: profile.location };
+// }
+
+const changePasswordService = async (userDetails: IJwtPayload, payload: IChangePassword) => {
+    // Service logic goes here
+    const { userId } = userDetails;
+    const { oldPassword, newPassword } = payload;
+
+    const user =  await UserModel.findById(userId).select('+password');
+    if(!user){
+        throw new ApiError(404,'User not found');
+    }
+
+    // const isPasswordMatched = await user.isPasswordMatched(oldPassword);
+    // if(!isPasswordMatched){
+    //     throw new ApiError(400,'Old password is incorrect');
+    // }
+    if(user.password !== oldPassword){
+        throw new ApiError(400,'Old password is incorrect');
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    return null;
 }
 
-const completeUserProfileService = async () => {
-
-
-}
-
-// const verifyCode = async (email: string, verifyCode: number) => {
-//     const user = await User.findOne({ email: email });
-//     if (!user) {
-//         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//     }
-//     if (user.codeExpireIn < new Date(Date.now())) {
-//         throw new AppError(httpStatus.BAD_REQUEST, 'Verify code is expired');
-//     }
-//     if (verifyCode !== user.verifyCode) {
-//         throw new AppError(httpStatus.BAD_REQUEST, "Code doesn't match");
-//     }
-//     const result = await User.findOneAndUpdate(
-//         { email: email },
-//         { isVerified: true },
-//         { new: true, runValidators: true }
-//     );
-
-//     if (!result) {
-//         throw new AppError(
-//             httpStatus.SERVICE_UNAVAILABLE,
-//             'Server temporary unable please try again letter'
-//         );
-//     }
-
-//     // Create JWT tokens
-//     const jwtPayload = {
-//         id: result?._id,
-//         profileId: result?.profileId,
-//         email: result?.email,
-//         role: result?.role as TUserRole,
-//     };
-
-//     const accessToken = createToken(
-//         jwtPayload,
-//         config.jwt_access_secret as string,
-//         config.jwt_access_expires_in as string
-//     );
-//     const refreshToken = createToken(
-//         jwtPayload,
-//         config.jwt_refresh_secret as string,
-//         config.jwt_refresh_expires_in as string
-//     );
-
-//     return {
-//         accessToken,
-//         refreshToken,
-//     };
-// };
-
-// const resendVerifyCode = async (email: string) => {
-//     const user = await User.findOne({ email: email });
-//     if (!user) {
-//         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//     }
-//     const verifyCode = generateVerifyCode();
-//     const updateUser = await User.findOneAndUpdate(
-//         { email: email },
-//         {
-//             verifyCode: verifyCode,
-//             codeExpireIn: new Date(Date.now() + 5 * 60000),
-//         },
-//         { new: true, runValidators: true }
-//     );
-//     if (!updateUser) {
-//         throw new AppError(
-//             httpStatus.INTERNAL_SERVER_ERROR,
-//             'Something went wrong . Please again resend the code after a few second'
-//         );
-//     }
-//     sendEmail({
-//         email: user.email,
-//         subject: 'Activate Your Account',
-//         html: registrationSuccessEmailBody('Dear', updateUser.verifyCode),
-//     });
-//     return null;
-// };
-
-// const getMyProfile = async (userData: JwtPayload) => {
-//     let result = null;
-//     if (userData.role === USER_ROLE.customer) {
-//         result = await Customer.findOne({ email: userData.email });
-//     }
-//     if (userData.role === USER_ROLE.provider) {
-//         result = await Provider.findOne({ email: userData.email });
-//     } else if (userData.role === USER_ROLE.superAdmin) {
-//         result = await SuperAdmin.findOne({ email: userData.email });
-//     }
-//     return result;
-// };
-
-// const deleteUserAccount = async (user: JwtPayload, password: string) => {
-//     const userData = await User.findById(user.id);
-
-//     if (!userData) {
-//         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//     }
-//     if (!(await User.isPasswordMatched(password, userData?.password))) {
-//         throw new AppError(httpStatus.FORBIDDEN, 'Password do not match');
-//     }
-
-//     await Customer.findByIdAndDelete(user.profileId);
-//     await User.findByIdAndDelete(user.id);
-
-//     return null;
-// };
-
-// // update user
-// const updateUserProfile = async (userData: JwtPayload, payload: any) => {
-//     if (payload.email || payload.phone) {
-//         throw new AppError(
-//             httpStatus.BAD_REQUEST,
-//             'You can not change the email or phone number'
-//         );
-//     }
-//     if (userData.role == USER_ROLE.customer) {
-//         const user = await Customer.findById(userData.profileId);
-//         if (!user) {
-//             throw new AppError(httpStatus.NOT_FOUND, 'Profile not found');
-//         }
-//         if (payload.city) {
-//             payload.isAddressProvided = true;
-//         }
-//         const result = await Customer.findByIdAndUpdate(
-//             userData.profileId,
-//             payload,
-//             {
-//                 new: true,
-//                 runValidators: true,
-//             }
-//         );
-//         if (payload.profile_image && user.profile_image) {
-//             deleteFileFromS3(user.profile_image);
-//         }
-//         if (payload.address_document && user.address_document) {
-//             deleteFileFromS3(user.address_document);
-//         }
-//         return result;
-//     } else if (userData.role == USER_ROLE.superAdmin) {
-//         const admin = await SuperAdmin.findById(userData.profileId);
-//         if (!admin) {
-//             throw new AppError(httpStatus.NOT_FOUND, 'Profile not found');
-//         }
-//         const result = await SuperAdmin.findByIdAndUpdate(
-//             userData.profileId,
-//             payload,
-//             { new: true, runValidators: true }
-//         );
-//         if (payload.profile_image && admin.profile_image) {
-//             deleteFileFromS3(admin.profile_image);
-//         }
-
-//         return result;
-//     } else if (userData.role == USER_ROLE.provider) {
-//         const provider = await Provider.findById(userData.profileId);
-//         if (!provider) {
-//             throw new AppError(httpStatus.NOT_FOUND, 'Profile not found');
-//         }
-//         if (payload.city) {
-//             payload.isAddressProvided = true;
-//         }
-//         const result = await Provider.findByIdAndUpdate(
-//             userData.profileId,
-//             payload,
-//             { new: true, runValidators: true }
-//         );
-//         if (payload.profile_image && provider.profile_image) {
-//             deleteFileFromS3(provider.profile_image);
-//         }
-//         if (payload.address_document && provider.address_document) {
-//             deleteFileFromS3(provider.address_document);
-//         }
-//         return result;
-//     }
-// };
-// // all cron jobs for users
-
-// cron.schedule('*/2 * * * *', async () => {
-//     try {
-//         const now = new Date();
-
-//         const expiredUsers = await User.find({
-//             isVerified: false,
-//             codeExpireIn: { $lte: now },
-//         });
-
-//         if (expiredUsers.length > 0) {
-//             const expiredUserIds = expiredUsers.map((user) => user._id);
-
-//             // Delete corresponding Customer documents
-//             const CustomerDeleteResult = await Customer.deleteMany({
-//                 user: { $in: expiredUserIds },
-//             });
-//             const ProviderDeleteResult = await Provider.deleteMany({
-//                 user: { $in: expiredUserIds },
-//             });
-
-//             // Delete the expired User documents
-//             const userDeleteResult = await User.deleteMany({
-//                 _id: { $in: expiredUserIds },
-//             });
-
-//             console.log(
-//                 `Deleted ${userDeleteResult.deletedCount} expired inactive users`
-//             );
-//             console.log(
-//                 `Deleted ${CustomerDeleteResult.deletedCount} associated Customer documents`
-//             );
-//             console.log(
-//                 `Deleted ${ProviderDeleteResult.deletedCount} associated Customer documents`
-//             );
-//         }
-//     } catch (error) {
-//         console.log('Error deleting expired users and associated data:', error);
-//     }
-// });
-
-// const changeUserStatus = async (id: string) => {
-//     const user = await User.findById(id);
-//     if (!user) {
-//         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//     }
-//     const result = await User.findByIdAndUpdate(
-//         id,
-//         { isBlocked: !user.isBlocked },
-//         { new: true, runValidators: true }
-//     );
-//     return result;
-// };
-
-// const adminVerifyUserFromDB = async (id: string) => {
-//     const user = await User.findById(id);
-//     if (!user) {
-//         throw new AppError(httpStatus.NOT_FOUND, 'User not found');
-//     }
-//     const result = await User.findByIdAndUpdate(
-//         id,
-//         { isAdminVerified: true },
-//         { new: true, runValidators: true }
-//     );
-//     return result;
-// };
-
-const userServices = {
-    registerUserService,
-    loginUserService,
-    completeUserProfileService,
-    // verifyCode,
-    // resendVerifyCode,
-    // getMyProfile,
-    // changeUserStatus,
-    // deleteUserAccount,
-    // updateUserProfile,
-    // adminVerifyUserFromDB,
+const UserServices = {
+    updateUserProfile, 
+    // addLocationService,
+    // addBankDetailService,
+    changePasswordService 
 };
-
-export default userServices;
+export default UserServices;

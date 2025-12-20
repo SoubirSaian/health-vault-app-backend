@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-        export const updateProviderData = z.object({
+        export const updatePostData = z.object({
             body: z.object({
                 name: z.string().optional(),
                 phone: z.string().optional(),
@@ -8,5 +8,5 @@ import { z } from "zod";
             }),
         });
 
-        const ProviderValidations = { updateProviderData };
-        export default ProviderValidations;
+        const PostValidations = { updatePostData };
+        export default PostValidations;

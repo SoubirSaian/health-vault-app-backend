@@ -1,77 +1,105 @@
-import { model, Schema, models } from "mongoose";
-import { IUser } from "./user.interface";
-import { USER_ROLE } from "../../../utilities/enum";
+import { model, models, Schema } from "mongoose";
+import { IUser } from "./User.interface";
 import bcrypt from "bcrypt";
 import config from "../../../config";
 
-const userSchema = new Schema<IUser>({
-    profile: { 
-        type: Schema.Types.ObjectId
-     },
-    name: { 
+
+const UserSchema = new Schema<IUser>({
+    name: {
         type: String,
-        required: true 
+        required: [true,"Name is required"],
     },
-    contact: { 
-        type: String, 
-        required: true
-    },
-    email: { type: String, required: true, unique: true },
-    password: { 
+    email: {
         type: String,
-        required: true 
+        required: [true,"email is required"],
     },
-    role :{
+    password: {
         type: String,
-        enun: Object.values(USER_ROLE),
-        required: true
+        required: [true,"Password is required"],
     },
-    isEmailVerified: { 
+    phone: {
+        type: String,
+        default: ''
+    },
+    image: {
+        type: String,
+        default: ''
+    },
+    isEmailVerified: {
         type: Boolean,
-        default: false 
+        default: false,
+    },
+    verificationCode: {
+        type: String,
+        default: ''
+    },
+    campaign: {
+        type: Number,
+        default: 0
+    },
+    isMoveAndDeliver: {
+        type: Boolean,
+        default: true
+    },
+    isBuyAndDeliver: {
+        type: Boolean,
+        default: true
+    },
+    isRecycle: {
+        type: Boolean,
+        default: true
+    },
+    isRemove: {
+        type: Boolean,
+        default: true
     },
     isBlockd: {
         type: Boolean,
         default: false
     },
-    verificationCode: { 
-        type: String,
-        default: null
-    }
-   
+    
 }, { timestamps: true });
 
-//hash password before saving
-userSchema.pre('save', async function (next) {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const user = this;
-    if (user.password) {
-        user.password = await bcrypt.hash(
-            user.password,
-            Number(config.bcrypt.salt_round)
-        );
-    }
-    next();
-});
+// UserSchema.pre('save', async function (next) {
+//     // eslint-disable-next-line @typescript-eslint/no-this-alias
+//     const user = this;
+//     if (user.password) {
+//         user.password = await bcrypt.hash(
+//             user.password,
+//             Number(config.bcrypt.salt_round)
+//         );
+//     }
+//     next();
+// });
 
-userSchema.post('save', function (doc, next) {
-    doc.password = '';
-    next();
-});
+// UserSchema.post('save', function (doc, next) {
+//     doc.password = '';
+//     next();
+// });
 
-// statics method for check is user exists
-userSchema.statics.isUserExists = async function (email: string) {
-    return await UserModel.findOne({ email }).select('+password');
-};
+// // statics method for check is user exists
+// UserSchema.statics.isUserExists = async function (phoneNumber: string) {
+//     return await UserModel.findOne({ phoneNumber }).select('+password');
+// };
 
-// statics method for check password match  ----
-userSchema.statics.isPasswordMatched = async function (
-    plainPasswords: string,
-    hashPassword: string
-) {
-    return await bcrypt.compare(plainPasswords, hashPassword);
-};
+// // statics method for check password match  ----
+// UserSchema.statics.isPasswordMatched = async function (
+//     plainPasswords: string,
+//     hashPassword: string
+// ) {
+//     return await bcrypt.compare(plainPasswords, hashPassword);
+// };
 
-const UserModel = models.User || model<IUser>("User", userSchema);
+// UserSchema.statics.isJWTIssuedBeforePasswordChange = async function (
+//     passwordChangeTimeStamp,
+//     jwtIssuedTimeStamp
+// ) {
+//     const passwordChangeTime =
+//         new Date(passwordChangeTimeStamp).getTime() / 1000;
+
+//     return passwordChangeTime > jwtIssuedTimeStamp;
+// };
+
+const UserModel = models.User || model<IUser>("User", UserSchema);
 
 export default UserModel;
