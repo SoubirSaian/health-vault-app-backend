@@ -37,22 +37,22 @@ const UserSchema = new Schema<IUser>({
         type: Number,
         default: 0
     },
-    isMoveAndDeliver: {
-        type: Boolean,
-        default: true
-    },
-    isBuyAndDeliver: {
-        type: Boolean,
-        default: true
-    },
-    isRecycle: {
-        type: Boolean,
-        default: true
-    },
-    isRemove: {
-        type: Boolean,
-        default: true
-    },
+    // isMoveAndDeliver: {
+    //     type: Boolean,
+    //     default: true
+    // },
+    // isBuyAndDeliver: {
+    //     type: Boolean,
+    //     default: true
+    // },
+    // isRecycle: {
+    //     type: Boolean,
+    //     default: true
+    // },
+    // isRemove: {
+    //     type: Boolean,
+    //     default: true
+    // },
     isBlockd: {
         type: Boolean,
         default: false

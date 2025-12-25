@@ -18,3 +18,10 @@ export interface IPost {
   deliveryTime: Date;
 
 }
+
+export interface INearbyPostParams {
+  // userId: string;
+  latitude: number;
+  longitude: number;
+  radiusKm: number; // 30 or 50
+}

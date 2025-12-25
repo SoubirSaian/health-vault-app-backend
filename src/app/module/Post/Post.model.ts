@@ -1,6 +1,7 @@
 import { model, models, Schema } from "mongoose";
 import { IPost } from "./Post.interface";
 import { ENUM_POST_PRIORITY, ENUM_POST_SIZE, ENUM_POST_STATUS } from "../../../utilities/enum";
+import { required } from "zod/v4/core/util.cjs";
 
 const PostSchema = new Schema<IPost>({
     creator: {
@@ -40,14 +41,34 @@ const PostSchema = new Schema<IPost>({
         default: ''
     }],
     pickUpLocation: {
-        location: {type: String},
-        latitude: {type: String},
-        longitude: {type: String}
+        type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point"
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        }
     },
     dropLocation: {
-        location: {type: String},
-        latitude: {type: String},
-        longitude: {type: String}
+        type: {
+            type: String,
+            enum: ["Point"],
+            default: "Point"
+        },
+        coordinates: {
+            type: [Number],
+            required: true
+        },
+        address: {
+            type: String,
+            required: true
+        }
     },
     category: {
         type: String
@@ -62,6 +83,13 @@ const PostSchema = new Schema<IPost>({
         type: Date
     },
 }, { timestamps: true });
+
+
+/* ✅ ADD INDEX RIGHT HERE */
+PostSchema.index({ pickUpLocation: "2dsphere" });
+
+/* (Optional) If needed later */
+PostSchema.index({ dropLocation: "2dsphere" });
 
 const PostModel = models.Post || model<IPost>("Post", PostSchema);
 

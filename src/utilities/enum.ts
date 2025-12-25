@@ -1,6 +1,7 @@
 
 export const ENUM_POST_STATUS = {
     PENDING: "Pending",
+    ACCEPTED: "Accepted",
     PICKED: "Picked",
     ON_THE_WAY: "On_The_Way",
     DELIVERED: "Delivered"

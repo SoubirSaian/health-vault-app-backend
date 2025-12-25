@@ -5,7 +5,7 @@ import { Server as HTTPServer } from 'http'; // Import HTTPServer type
 import app from './app';
 import { errorLogger, logger } from './shared/logger';
 import config from './config';
-import mongoDBConnection from './connection/mongoDB';
+import mongoDBConnection from './config/mongoDB';
 // import runCronJobEverydatAtNight from './helper/cronHelper';
 
 let myServer: HTTPServer | undefined;

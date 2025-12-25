@@ -8,30 +8,33 @@ import { uploadProfile } from "../../../helper/multerUpload";
 
 const userRouter = express.Router();
 
-// userRouter.post("/add-location",
-//     auth(["Supplier","Customer"]),
-//     validateRequest(UserValidations.addLocationValidation),
-//     UserController.addLocation
-// );
 
 userRouter.patch("/update-profile",
-    auth(["Supplier","Customer"]),
+    // auth(["Supplier","Customer"]),
     uploadProfile.single('profile-image'),
     validateRequest(UserValidations.updateprofileValidation),
     UserController.updateProfile
 );
 
 userRouter.patch("/change-password",
-    auth(["Supplier","Customer"]),
+    // auth(["Supplier","Customer"]),
     validateRequest(UserValidations.changePasswordValidation),
     UserController.changePassword
 );
 
-// userRouter.post("/add-bank-details",
-//     auth(["Supplier","Customer"]),
-//     validateRequest(UserValidations.addBankDetailValidation),
-//     UserController.addBankDetail
-// );
+//dashboard
+
+userRouter.get("/get-al-user",
+    // auth(["Supplier","Customer"]),
+    // validateRequest(UserValidations.addBankDetailValidation),
+    UserController.dashboardGetUser
+);
+
+userRouter.get("/block-user/:id",
+    // auth(["Supplier","Customer"]),
+    // validateRequest(UserValidations.addBankDetailValidation),
+    UserController.blockUser
+);
 
 
 export default userRouter;

@@ -7,7 +7,7 @@ import SettingsController from "./Settings.controller";
 
 const settingsRouter = express.Router();
 
-//help and support routes
+//contact us routes
 settingsRouter.post(
     "/submit-contact-us",
     // auth(),

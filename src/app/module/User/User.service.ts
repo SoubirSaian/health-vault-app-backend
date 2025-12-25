@@ -5,6 +5,7 @@ import UserModel from "./User.model";
 import { JwtPayload } from "jsonwebtoken";
 import deleteOldFile from "../../../utilities/deleteFile";
 import { IJwtPayload } from "../../../interface/jwt.interface";
+import { email } from "zod";
 
 
 
@@ -139,10 +140,45 @@ const changePasswordService = async (userDetails: IJwtPayload, payload: IChangeP
     return null;
 }
 
+
+//dashboard
+
+const getAllUserService = async () => {
+    const users = await UserModel.find({}).lean();
+    return users;
+}
+
+const blockUserService = async (userId: string) => {
+    
+    if(!userId){
+        throw new ApiError(400,"User id is required to block a user");
+    }
+
+    const user = await UserModel.findById(userId);
+
+    if(!user){
+        throw new ApiError(404,"User not found to block.");
+    }
+
+    user.isBlocked = !user.isBlocked;
+
+    let msg = user.isBlocked ? "User has been blocked successfully." : "User has been unblocked successfully.";
+
+    await user.save();
+
+    return {
+        user: { name: user.name, email: user.email, isBlocked: user.isBlocked },
+        msg
+    };
+}
+
 const UserServices = {
     updateUserProfile, 
     // addLocationService,
     // addBankDetailService,
-    changePasswordService 
+    changePasswordService ,
+
+    getAllUserService,
+    blockUserService
 };
 export default UserServices;

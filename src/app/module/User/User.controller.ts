@@ -3,32 +3,7 @@ import sendResponse from "../../../utilities/sendResponse";
 import { AuthRequest } from "../../../interface/authRequest";
 import UserServices from "./User.service";
 
-const addLocation = catchAsync(async (req, res) => {
 
-     const { user } = req as AuthRequest;
-
-    const result = await UserServices.addLocationService(user,req.body);
-    
-    sendResponse(res, {
-        statusCode: 200,
-        success: true,
-        message: "Location added successfully.",
-        data: result
-    });
-});
-
-const addBankDetail = catchAsync(async (req, res) => {
-     const { user } = req as AuthRequest;
-
-    const result = await UserServices.addBankDetailService(user,req.body);
-    
-    sendResponse(res, {
-        statusCode: 200,
-        success: true,
-        message: "Bank detail added successfully.",
-        data: result,
-    });
-});
 
 const updateProfile = catchAsync(async (req, res) => {
 
@@ -58,10 +33,36 @@ const changePassword = catchAsync(async (req, res) => {
     });
 });
 
+//dashboard
+
+const dashboardGetUser = catchAsync(async (req, res) => {
+
+    const result = await UserServices.getAllUserService();
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Retrieved all users successfully.",
+        data: result,
+    });
+});
+
+const blockUser = catchAsync(async (req, res) => {
+
+    const result = await UserServices.blockUserService(req.params.id);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Password changed successfully.",
+        data: result,
+    });
+});
+
 const UserController = { 
-    addLocation,
-    addBankDetail,
     updateProfile,
-    changePassword
+    changePassword,
+    dashboardGetUser,
+    blockUser
  };
 export default UserController;
